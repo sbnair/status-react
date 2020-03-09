@@ -8,9 +8,12 @@
             [status-im.ui.components.colors :as colors]
             [status-im.ui.components.icons.vector-icons :as icons]
             [status-im.ui.components.list-item.views :as list-item]
-            [status-im.ui.components.list.views :as list]
-            [status-im.ui.components.react :as react]
-            [status-im.ui.components.toolbar.styles :as toolbar.styles]
+            [status-im.wallet.utils :as wallet.utils]
+            [status-im.ui.starter-pack.view :as starter-pack]
+            [reagent.core :as reagent]
+            [re-frame.core :as re-frame]
+            [status-im.ui.components.reanimated :as reanimated]
+            [oops.core :refer [oget]]
             [status-im.ui.screens.wallet.accounts.sheets :as sheets]
             [status-im.ui.screens.wallet.accounts.styles :as styles]
             [status-im.utils.utils :as utils.utils]
@@ -207,6 +210,7 @@
                                 :scrollEventThrottle 1}
         [react/view {:margin-top 8}
          [accounts]]
+        [starter-pack/starter-pack]
         [assets]
         [react/view {:height 68}]]
        [send-button]])))
