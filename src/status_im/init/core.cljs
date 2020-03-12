@@ -9,6 +9,7 @@
             [status-im.ui.screens.db :refer [app-db]]
             [status-im.utils.fx :as fx]
             [status-im.utils.platform :as platform]
+            [status-im.payments.core :as payment]
             [status-im.utils.theme :as theme]))
 
 (fx/defn initialize-app-db
@@ -61,6 +62,7 @@
              ::open-multiaccounts                   #(re-frame/dispatch [::initialize-multiaccounts % {:logout? false}])
              :ui/listen-to-window-dimensions-change nil
              ::network/listen-to-network-info       nil
+             ::payment/init-connection              nil
              :hardwallet/register-card-events       nil
              :hardwallet/check-nfc-support          nil
              :hardwallet/check-nfc-enabled          nil
