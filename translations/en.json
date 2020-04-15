@@ -575,6 +575,8 @@
     "keycard-recovery-phrase-confirmation-text": "You won’t have a second chance! If you lose or change your device, you will not be able to access your keys or any assets associated with it unless you have your seed phrase.",
     "keycard-recovery-phrase-confirmation-title": "Written the seed phrase down?",
     "keycard-recovery-success-header": "Your keys have been\n successfully recovered",
+    "keycard-redeem-tx": "Redeem assets",
+    "keycard-redeem-tx-desc": "Tap the card to sign and receive assets",
     "keycard-unauthorized-operation": "You're unauthorized to perform this operation.\n Please tap valid card and try again.",
     "language": "Language",
     "learn-more": "Learn more",
