@@ -24,25 +24,23 @@
     username
     (stateofus/subdomain username)))
 
-(handlers/register-handler-fx
- :update-ens-tx-state
- (fn [{:keys [db]} [_ new-state username custom-domain? tx-hash]]
-   {:db (assoc-in db [:ens/registrations tx-hash] {:state new-state
-                                                   :username username
-                                                   :custom-domain? custom-domain?})}))
+(fx/defn update-ens-tx-state
+  {:events [:update-ens-tx-state]}
+  [{:keys [db]} new-state username custom-domain? tx-hash]
+  {:db (assoc-in db [:ens/registrations tx-hash] {:state          new-state
+                                                  :username       username
+                                                  :custom-domain? custom-domain?})})
 
-(handlers/register-handler-fx
- :update-ens-tx-state-and-redirect
- (fn [cofx [_ new-state username custom-domain? tx-hash]]
-   (fx/merge cofx
-             (re-frame/dispatch [:update-ens-tx-state new-state username custom-domain? tx-hash])
-             (re-frame/dispatch [::redirect-to-ens-summary]))))
+(fx/defn update-ens-tx-state-and-redirect
+  {:events [:update-ens-tx-state-and-redirect]}
+  [_ new-state username custom-domain? tx-hash]
+  {:dispatch-n [[:update-ens-tx-state new-state username custom-domain? tx-hash]
+                [::redirect-to-ens-summary]]})
 
-(handlers/register-handler-fx
- :clear-ens-registration
- (fn [{:keys [db]} [_ tx-hash]]
-   (let [registrations (get db :ens/registrations)]
-     {:db (assoc db :ens/registrations (dissoc registrations tx-hash))})))
+(fx/defn clear-ens-registration
+  {:events [:clear-ens-registration]}
+  [{:keys [db]} tx-hash]
+  {:db (update db :ens/registrations dissoc tx-hash)})
 
 (re-frame/reg-fx
  ::resolve-address
