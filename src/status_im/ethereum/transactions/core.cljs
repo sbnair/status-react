@@ -235,21 +235,30 @@
     (apply fx/merge cofx (tx-fetching-ended [checksum]) effects)))
 
 (fx/defn check-ens-transactions
-  [{:keys [db]} transfers]
-  (let [registrations (get db :ens/registrations)]
-    (doseq [[hash {:keys [state username custom-domain?]}] registrations]
-      (when (or (= state :dismissed) (= state :submitted))
-        (doseq [transaction transfers]
-          (let [transaction-hash (get transaction :hash)
-                type (get transaction :type)
-                transaction-success (get transaction :transfer)]
-            (when (= hash transaction-hash)
-              ; TODO Return from the loop once we find a match
-              (when (= transaction-success true)
-                (re-frame/dispatch [:update-ens-tx-state :success username custom-domain? hash])
-                (re-frame/dispatch [::status-im.ens.core/save-username custom-domain? username]))
-              (when (= type :failed)
-                (re-frame/dispatch [:update-ens-tx-state :failure username custom-domain? hash])))))))))
+  [{:keys [db] :as cofx} transfers]
+  (let [set-of-transactions-hash (reduce (fn [acc {:keys [hash]}] (conj acc hash)) #{} transfers)
+        registrations (filter
+                        (fn [[hash {:keys [state]}]]
+                          (and
+                            (or (= state :dismissed) (= state :submitted))
+                            (contains? set-of-transactions-hash hash)))
+                        (get db :ens/registrations))
+        fxs (map (fn [[hash {:keys [username custom-domain?]}]]
+                   (let [transfer (first (filter (fn [transfer] (let [transfer-hash (get transfer :hash)] (= transfer-hash hash))) transfers))
+                         type (get transfer :type)
+                         transaction-success (get transfer :transfer)]
+                     (cond
+                       (= transaction-success true)
+                       (fx/merge cofx
+                         (status-im.ens.core/update-ens-tx-state :success username custom-domain? hash)
+                         (status-im.ens.core/save-username custom-domain? username))
+                       (= type :failed)
+                       (status-im.ens.core/update-ens-tx-state :failure username custom-domain? hash)
+                       :else
+                       nil)))
+              registrations)
+        ]
+    (apply fx/merge cofx fxs)))
 
 (fx/defn new-transfers
   {:events [::new-transfers]}
