@@ -56,7 +56,8 @@
     "nyc": "^14.1.1",
     "patch-package": "^5.1.1",
     "rn-snoopy": "git+https://github.com/status-im/rn-snoopy.git#v2.0.2-status",
-    "rnpm-plugin-desktop-qt": "git+https://github.com/status-im/rnpm-plugin-desktop-qt.git"
+    "rnpm-plugin-desktop-qt": "git+https://github.com/status-im/rnpm-plugin-desktop-qt.git",
+    "shadow-cljs": "2.8.99"
   },
   "optionalDependencies": {
     "appdmg": "^0.6.0"

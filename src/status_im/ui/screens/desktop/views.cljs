@@ -7,6 +7,7 @@
                                                       new-group
                                                       add-participants-toggle-list]]
             [status-im.ui.screens.profile.group-chat.views :refer [group-chat-profile]]
+            ["react-native-desktop-config" :as desktop-config]
             [status-im.ui.screens.multiaccounts.login.views :as login.views]
             [status-im.ui.screens.multiaccounts.recover.views :as recover.views]
             [status-im.ui.screens.multiaccounts.views :as multiaccounts.views]
@@ -22,9 +23,9 @@
                   version [:get-app-version]]
     {:component-did-mount
      (fn []
-       (.getValue rn-dependencies/desktop-config "desktop-alpha-warning-shown-for-version"
+       (.getValue desktop-config "desktop-alpha-warning-shown-for-version"
                   #(when-not (= %1 version)
-                     (.setValue ^js rn-dependencies/desktop-config "desktop-alpha-warning-shown-for-version" version)
+                     (.setValue ^js desktop-config "desktop-alpha-warning-shown-for-version" version)
                      (utils/show-popup nil (i18n/label :desktop-alpha-release-warning)))))}
 
     (let [view-id (or view-id :intro) ;; TODO some default value
