@@ -26,6 +26,9 @@ HELP_FUN = \
 			   print "\n"; \
 		   }
 HOST_OS := $(shell uname | tr '[:upper:]' '[:lower:]')
+ifeq ($(HOST_OS),darwin)
+	HOST_OS=macos
+endif
 
 # This can come from Jenkins
 ifndef BUILD_TAG
@@ -238,8 +241,7 @@ watch-android-genymotion: export TARGET ?= android
 watch-android-genymotion: _watch-android-genymotion
 
 watch-desktop: export TARGET ?= $(HOST_OS)
-watch-desktop:
-	clj -R:dev build.clj watch --platform desktop
+watch-desktop: _watch-desktop
 
 desktop-server: export TARGET ?= $(HOST_OS)
 desktop-server:
