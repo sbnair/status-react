@@ -29,7 +29,7 @@ let
               lib.mkFilter {
                 root = path;
                 include = [
-                  "android/.*" "translations/.*" "status-modules/.*"
+                  "android/.*" "status-modules/.*"
                   "resources/.*" "mobile/js_files/.*" ".babelrc"
                 ];
                 exclude = [
@@ -68,7 +68,6 @@ let
           chmod -R u+w ${projectBuildDir}
 
           cp -R ${projectBuildDir}/status-modules/ ${projectBuildDir}/node_modules/status-modules/
-          cp -R ${projectBuildDir}/translations/ ${projectBuildDir}/node_modules/status-modules/translations/
 
           # Create a dummy VERSION, since we don't want this expression to be invalidated just because the version changed
           echo '0.0.1' > ${projectBuildDir}/VERSION
