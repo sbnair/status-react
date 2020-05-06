@@ -4,7 +4,6 @@
             [re-frame.core :as re-frame]
             [status-im.multiaccounts.core :as multiaccounts]
             [status-im.ui.components.colors :as colors]
-            [status-im.multiaccounts.core :as multiaccounts]
             [status-im.ui.screens.chat.photos :as photos]
             [status-im.ui.components.list-item.views :as list-item]
             [status-im.ui.components.button :as button]
@@ -139,7 +138,7 @@
      [react/view {:align-items :center :margin-top 16 :margin-bottom 40}
       [sign-with-keycard-button nil nil]])])
 
-(defn redeem-tx-header [multiaccount small-screen?]
+(defn redeem-tx-header [account small-screen?]
   (fn []
     [react/view {:style {:align-self :stretch :margin-top 30}}
      [separator]
@@ -150,13 +149,14 @@
       [react/text {:style {:flex 2 :margin-right 16}} (i18n/label :t/account-title)]
       [react/text {:number-of-lines 1
                    :ellipsize-mode :middle
-                   :style {:padding-left 16 :margin-left 8
+                   :style {:padding-left 16
                            :color colors/gray
                            :flex 3}}
-       (:name multiaccount)]
-      [react/view {:style {:flex 1 :padding-left 8}}
-       [photos/photo (multiaccounts/displayed-photo multiaccount)
-        {:size (if small-screen? 20 32)}]]]
+       (displayed-name account)]
+      (when (:public-key account)
+        [react/view {:style {:flex 1 :padding-left 8}}
+         [photos/photo (multiaccounts/displayed-photo account)
+          {:size (if small-screen? 20 32)}]])]
      [separator]
      [react/text {:style {:padding-left 16 :margin-vertical 8}} (i18n/label :t/message)]
      [react/text {:style {:padding-left 16 :margin-bottom 8
@@ -195,10 +195,9 @@
                      :label           (i18n/label :t/decline)
                      :on-press        #(re-frame/dispatch [:signing.ui/cancel-is-pressed])}]]))
 
-(defn signature-request [{:keys [formatted-data fiat-amount fiat-currency keycard-step]}
+(defn signature-request [{:keys [formatted-data account fiat-amount fiat-currency keycard-step]}
                          connected?
-                         small-screen?
-                         multiaccount]
+                         small-screen?]
   (let [message (:message formatted-data)]
     [react/view (assoc (styles/message) :padding-vertical 16)
      [keycard-sheet/connect-keycard
@@ -208,7 +207,7 @@
        :on-cancel     #(re-frame/dispatch [:signing.ui/cancel-is-pressed])
        :params
        (if (:receiver message)
-         {:header (redeem-tx-header multiaccount small-screen?)
+         {:header (redeem-tx-header account small-screen?)
           :title (i18n/label :t/confirmation-request)
           :small-screen? small-screen?
           :state-translations {:init {:title :t/keycard-redeem-tx
@@ -285,12 +284,11 @@
       [react/view])))
 
 (views/defview message-sheet []
-  (views/letsubs [{:keys [formatted-data type] :as sign} [:signing/sign]
+  (views/letsubs [{:keys [formatted-data type] :as sign} [:signing/sign-message]
                   small-screen? [:dimensions/small-screen?]
-                  keycard [:keycard]
-                  multiaccount [:multiaccount]]
+                  keycard [:keycard]]
     (if (= type :pinless)
-      [signature-request sign (:card-connected? keycard) small-screen? multiaccount]
+      [signature-request sign (:card-connected? keycard) small-screen?]
       [react/view (styles/message)
        [react/view styles/message-header
         [react/text {:style {:typography :title-bold}} (i18n/label :t/signing-a-message)]
