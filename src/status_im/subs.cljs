@@ -2059,26 +2059,26 @@
    signing-phrase))
 
 (re-frame/reg-sub
-  :signing/sign-message
-  :<- [:signing/sign]
-  :<- [:multiaccount]
-  :<- [:prices]
-  (fn [[sign multiaccount prices]]
-    (if (= :pinless (:type sign))
-      (let [message (get-in sign [:formatted-data :message])]
-        (cond-> sign
-          (and (:amount message) (:currency message))
-          (assoc :fiat-amount
-                 (money/fiat-amount-value (:amount message)
-                                          (:currency message)
-                                          :USD prices)
-                 :fiat-currency "USD")
-          (:receiver message)
-          (assoc :account
-                 (if (= (:address multiaccount) (:receiver message)) 
-                   multiaccount 
-                   {:address (:receiver message)}))))
-      sign)))
+ :signing/sign-message
+ :<- [:signing/sign]
+ :<- [:multiaccount]
+ :<- [:prices]
+ (fn [[sign multiaccount prices]]
+   (if (= :pinless (:type sign))
+     (let [message (get-in sign [:formatted-data :message])]
+       (cond-> sign
+         (and (:amount message) (:currency message))
+         (assoc :fiat-amount
+                (money/fiat-amount-value (:amount message)
+                                         (:currency message)
+                                         :USD prices)
+                :fiat-currency "USD")
+         (:receiver message)
+         (assoc :account
+                (if (= (:address multiaccount) (:receiver message))
+                  multiaccount
+                  {:address (:receiver message)}))))
+     sign)))
 
 (defn- too-precise-amount?
   "Checks if number has any extra digit beyond the allowed number of decimals.
