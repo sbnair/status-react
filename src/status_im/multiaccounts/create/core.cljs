@@ -13,6 +13,7 @@
             [status-im.ui.components.bottom-sheet.core :as bottom-sheet]
             [status-im.ui.components.colors :as colors]
             [status-im.navigation :as navigation]
+            [status-im.utils.config :as config]
             [status-im.utils.fx :as fx]
             [status-im.utils.platform :as platform]
             [status-im.utils.security :as security]
@@ -37,9 +38,10 @@
       (inverted (dec (step-kw-to-num step))))))
 
 (defn inc-step [step]
-  (let [inverted  (map-invert step-kw-to-num)]
+  (let [inverted (map-invert step-kw-to-num)]
     (if (and (= step :choose-key)
-             (or (not platform/android?)
+             (or (not (or platform/android?
+                          config/keycard-test-menu-enabled?))
                  (not (nfc/nfc-supported?))))
       :create-code
       (inverted (inc (step-kw-to-num step))))))
