@@ -1,12 +1,11 @@
 { stdenv, lib, writeShellScriptBin, fetchurl }:
 
-# Put the downloaded files in a fake Maven repository
-name: source:
-
 let
   inherit (lib)
     removeSuffix optionalString splitString concatMapStrings
     attrByPath attrValues last makeOverridable;
+
+  deps = import ./deps.nix;
 
   # some .jar files have an `-aot` suffix that doesn't work for .pom files
   getPOM = jarUrl: "${removeSuffix "-aot" jarUrl}.pom";
@@ -62,10 +61,10 @@ let
         '' else ""
         }
       '')
-    (attrValues source)));
+    (attrValues deps)));
 
 in makeOverridable stdenv.mkDerivation {
-  inherit name;
+  name = "status-react-maven-deps";
   phases = [ "buildPhase" ];
   buildPhase = "${script}/bin/create-local-maven-repo";
 }

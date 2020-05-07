@@ -19,7 +19,7 @@ let
     buildInputs = with pkgs; lib.unique ([
       # core utilities that should always be present in a shell
       bash curl wget file unzip flock
-      git gnumake jq ncurses gnugrep
+      git gnumake jq ncurses gnugrep parallel
       # build specific utilities
       clojure maven watchman
       # other nice to have stuff
@@ -45,8 +45,6 @@ let
 
   # An attrset for easier merging with default shell
   shells = {
-    inherit default;
-
     # for calling clojure targets in CI or Makefile
     clojure = pkgs.mkShell {
       buildInputs = with pkgs; [ clojure flock maven nodejs openjdk ];
@@ -82,4 +80,6 @@ let
 
 # values here can be selected using `nix-shell --attr shells.$TARGET default.nix`
 # the nix/scripts/shell.sh wrapper does this for us and expects TARGET to be set
-in lib.mapAttrs mergeDefaultShell shells
+in {
+  inherit default;
+} // lib.mapAttrs mergeDefaultShell shells

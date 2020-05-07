@@ -89,8 +89,9 @@ nix-add-gcroots: export TARGET := default
 nix-add-gcroots: ##@nix Add Nix GC roots to avoid status-react expressions being garbage collected
 	nix/scripts/gcroots.sh
 
+nix-update-gradle: export TARGET := android
 nix-update-gradle: ##@nix Update maven nix expressions based on current gradle setup
-	nix/mobile/android/maven-and-npm-deps/maven/generate-nix.sh
+	nix/deps/maven/generate.sh
 
 nix-update-clojure: export TARGET := clojure
 nix-update-clojure: ##@nix Update maven nix expressions based on current clojure setup
