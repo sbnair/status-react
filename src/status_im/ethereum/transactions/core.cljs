@@ -4,6 +4,7 @@
             [status-im.ethereum.eip55 :as eip55]
             [status-im.ethereum.encode :as encode]
             [status-im.ethereum.json-rpc :as json-rpc]
+            [status-im.ens.core :as ens]
             [status-im.utils.fx :as fx]
             [status-im.wallet.core :as wallet]
             [taoensso.timbre :as log]
@@ -205,8 +206,7 @@
   [{:keys [db]} address]
   {:db (assoc-in db [:wallet :fetching address :all-fetched?] true)})
 
-(fx/defn new-transfers
-  {:events [::new-transfers]}
+(fx/defn handle-mew-transfer
   [{:keys [db] :as cofx} transfers {:keys [address limit]}]
   (log/debug "[transfers] new-transfers"
              "address" address
@@ -233,6 +233,30 @@
                   (< (count transfers) limit)
                   (conj (tx-history-end-reached checksum)))]
     (apply fx/merge cofx (tx-fetching-ended [checksum]) effects)))
+
+(fx/defn check-ens-transactions
+  [{:keys [db]} transfers]
+  (let [registrations (get db :ens/registrations)]
+    (doseq [[hash {:keys [state username custom-domain?]}] registrations]
+      (when (or (= state :dismissed) (= state :submitted))
+        (doseq [transaction transfers]
+          (let [transaction-hash (get transaction :hash)
+                type (get transaction :type)
+                transaction-success (get transaction :transfer)]
+            (when (= hash transaction-hash)
+              ; TODO Return from the loop once we find a match
+              (when (= transaction-success true)
+                (re-frame/dispatch [:update-ens-tx-state :success username custom-domain? hash])
+                (re-frame/dispatch [::status-im.ens.core/save-username custom-domain? username]))
+              (when (= type :failed)
+                (re-frame/dispatch [:update-ens-tx-state :failure username custom-domain? hash])))))))))
+
+(fx/defn new-transfers
+  {:events [::new-transfers]}
+  [cofx transfers params]
+  (fx/merge cofx
+            (handle-mew-transfer transfers params)
+            (check-ens-transactions transfers)))
 
 (fx/defn tx-fetching-failed
   {:events [::tx-fetching-failed]}
