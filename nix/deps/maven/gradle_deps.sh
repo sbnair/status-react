@@ -4,6 +4,10 @@ set -Eeu
 
 echo -en "\033[2K - Checking deps: $1\r" >&2
 
+GIT_ROOT=$(cd "${BASH_SOURCE%/*}" && git rev-parse --show-toplevel)
+# Gradle needs to be run in 'android' subfolder
+cd $GIT_ROOT/android
+
 # Run the gradle command for a project and:
 # - remove lines that end with (*) or (n) but don't start with (+)
 # - keep only lines that start with \--- or +---
