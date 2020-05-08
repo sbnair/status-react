@@ -67,10 +67,12 @@ function determineArtifactUrl() {
   local path=$(getPath "${tokens[@]}")
 
   # check old file for URL to avoid making requests if possible
-  local url=$(grep ${path} ${CUR_DIR}/deps.urls.old)
-  if [[ ${?} -eq 0 ]]; then
-      echo "${url}"
-      return
+  if [[ -s "${CUR_DIR}/deps.urls.old" ]]; then
+      local url=$(grep ${path} ${CUR_DIR}/deps.urls.old)
+      if [[ -n "${url}" ]]; then
+          echo "${url}"
+          return
+      fi
   fi
 
   # otherwise try to find it via fetching
