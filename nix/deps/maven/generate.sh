@@ -25,7 +25,7 @@ echo "Regenerating Nix files..."
 cd $GIT_ROOT/android
 
 # Generate list of Gradle sub-projects
-${CUR_DIR}/gradle_projects.sh | sort -u -o ${PROJ_LIST}
+#${CUR_DIR}/gradle_projects.sh | sort -u -o ${PROJ_LIST}
 
 echo -e "Found ${GRN}$(wc -l < ${PROJ_LIST})${RST} sub-projects..."
 
@@ -39,7 +39,9 @@ parallel --will-cite \
 echo -e "\033[2KFound ${GRN}$(wc -l < ${DEPS_LIST})${RST} dependencies..."
 
 # Save old URLs file to improve search
-[[ -s "${DEPS_URLS}.old" ]] || mv "${DEPS_URLS}" "${DEPS_URLS}.old"
+if [[ ! -s "${DEPS_URLS}.old" ]] && [[ -s "${DEPS_URLS}" ]]; then
+    mv "${DEPS_URLS}" "${DEPS_URLS}.old"
+fi
 
 # find download URLs for each dependency
 DEPENDENCIES=$(cat ${DEPS_LIST})

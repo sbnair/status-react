@@ -7,7 +7,6 @@
 #
 
 CUR_DIR=$(cd "${BASH_SOURCE%/*}" && pwd)
-MAVEN_CACHE_PATH="${HOME}/.m2/repository"
 
 # sources REPOS associative array
 source ${CUR_DIR}/repos.sh
@@ -58,15 +57,22 @@ if nix_fetch "${OBJ_REL_URL}.jar" &>/dev/null; then
 elif nix_fetch "${OBJ_REL_URL}.aar" &>/dev/null; then
     OBJ_TYPE="aar"
 else
-    echo " ! Failed to identify dep type: ${OBJ_REL_URL}" >&2
+    OBJ_TYPE="pom"
+fi
+
+# Some deps have only a POM, nor JAR or AAR
+if [[ "${OBJ_TYPE}" != "pom" ]]; then
+    OBJ_PATH=$(get_nix_path "${OBJ_REL_URL}.${OBJ_TYPE}")
+    OBJ_SHA256=$(get_nix_sha "${OBJ_REL_URL}.${OBJ_TYPE}")
+    OBJ_SHA1=$(get_sha1 "${OBJ_PATH}")
+fi
+
+POM_PATH=$(get_nix_path "${OBJ_REL_URL}.pom")
+if [[ -z "${POM_PATH}" ]]; then
+    echo "Failed to fetch: ${OBJ_REL_URL}.pom" >&2
     exit 1
 fi
 
-OBJ_PATH=$(get_nix_path "${OBJ_REL_URL}.${OBJ_TYPE}")
-OBJ_SHA256=$(get_nix_sha "${OBJ_REL_URL}.${OBJ_TYPE}")
-OBJ_SHA1=$(get_sha1 "${OBJ_PATH}")
-
-POM_PATH=$(get_nix_path "${OBJ_REL_URL}.pom")
 POM_SHA256=$(get_nix_sha "${OBJ_REL_URL}.pom")
 POM_SHA1=$(get_sha1 "${POM_PATH}")
 
@@ -76,14 +82,21 @@ echo -n "
   {
     host = \"${REPOS[${REPO_NAME}]}\";
     path = \"${OBJ_REL_NAME}\";
-    type = \"${OBJ_TYPE}\";
+    type = \"${OBJ_TYPE}\";"
+if [[ -n "${POM_SHA256}" ]]; then
+    echo -n "
     pom = {
       sha1 = \"${POM_SHA1}\";
       sha256 = \"${POM_SHA256}\";
-    };
+    };"
+fi
+if [[ -n "${OBJ_SHA256}" ]]; then
+    echo -n "
     jar = {
       sha1 = \"${OBJ_SHA1}\";
       sha256 = \"${OBJ_SHA256}\";
-    };
+    };"
+fi
+echo -n "
   };
 "

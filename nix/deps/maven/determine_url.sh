@@ -4,20 +4,14 @@ CUR_DIR=$(cd "${BASH_SOURCE%/*}" && pwd)
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
-mavenSources=( \
-  https://dl.google.com/dl/android/maven2 \
-  https://jcenter.bintray.com \
-  https://plugins.gradle.org/m2 \
-  https://repo.maven.apache.org/maven2 \
-  https://maven.fabric.io/public \
-  https://jitpack.io \
-)
-mavenSourcesSedFilter=$(join_by '|' ${mavenSources[@]})
+# sources REPOS associative array
+source ${CUR_DIR}/repos.sh
+mavenSourcesSedFilter=$(join_by '|' ${REPOS[@]})
 
 # Converts a URL to a Maven package ID (e.g. https://dl.google.com/dl/android/maven2/android/arch/core/common/1.0.0/common-1.0.0 -> android.arch.core:common:1.0.0)
 function getPackageIdFromURL() {
   local url="$1"
-  local path=$(echo $url | sed -E "s;($mavenSourcesSedFilter)/(.+);\2;")
+  local path=$(echo $url | sed -E "s;(${mavenSourcesSedFilter})/(.+);\2;")
 
   IFS='/' read -ra tokens <<< "$path"
   local groupLength=$(( ${#tokens[@]} - 3 ))
@@ -40,6 +34,9 @@ function getPath() {
   local groupId=${tokens[0]}
   local artifactId=${tokens[1]}
   local version=${tokens[2]}
+  if [[ "${version}" == "jar" ]] || [[ "${version}" == "aar" ]]; then
+    local version=${tokens[3]}
+  fi
 
   groupId=$(echo $groupId | tr '.' '/')
   echo "$groupId/$artifactId/$version/$artifactId-$version"
@@ -52,7 +49,9 @@ function tryGetPOMFromURL() {
     RVAL=${?}
     POM_PATH=$(echo "${FETCH_OUT}" | tail -n1)
     # We symlink the POM it can be used with retrieveAdditionalDependencies
-    [[ ${RVAL} -eq 0 ]] && ln -s "${POM_PATH}" "${TMP_POM_SYMLINK}"
+    if [[ ${RVAL} -eq 0 ]] && [[ ! -L "${TMP_POM_SYMLINK}" ]]; then
+        ln -s "${POM_PATH}" "${TMP_POM_SYMLINK}"
+    fi
     return ${RVAL}
 }
 
@@ -62,8 +61,6 @@ function determineArtifactUrl() {
   IFS=':' read -ra tokens <<< "$1"
   local groupId=${tokens[0]}
   [ -z "$groupId" ] && return
-  local artifactId=${tokens[1]}
-  local version=$(echo "${tokens[2]}" | cut -d'@' -f1)
   local path=$(getPath "${tokens[@]}")
 
   # check old file for URL to avoid making requests if possible
@@ -76,7 +73,7 @@ function determineArtifactUrl() {
   fi
 
   # otherwise try to find it via fetching
-  for mavenSourceUrl in ${mavenSources[@]}; do
+  for mavenSourceUrl in ${REPOS[@]}; do
     if tryGetPOMFromURL "$mavenSourceUrl/$path"; then
       echo "$mavenSourceUrl/$path"
       return
@@ -129,7 +126,7 @@ function retrieveAdditionalDependencies() {
         continue
       elif [ "$artifactUrl" = "<NOTFOUND>" ]; then
         # Some dependencies don't contain a normal format, so we ignore them (e.g. `com.squareup.okhttp:okhttp:{strictly`)
-        echo -e "\033[2K ! Failed to find URL for: $DEP" >&2
+        echo -e "\033[2K ! Failed to find URL for: $additional_dep_id" >&2
         continue
       fi
 
