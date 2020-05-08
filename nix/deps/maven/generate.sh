@@ -25,16 +25,16 @@ echo "Regenerating Nix files..."
 cd $GIT_ROOT/android
 
 # Generate list of Gradle sub-projects
-#${CUR_DIR}/gradle_projects.sh | sort -u -o ${PROJ_LIST}
+${CUR_DIR}/gradle_projects.sh | sort -u -o ${PROJ_LIST}
 
 echo -e "Found ${GRN}$(wc -l < ${PROJ_LIST})${RST} sub-projects..."
 
 # check each sub-project in parallel, the "" is for local deps
-#PROJECTS=$(cat ${PROJ_LIST})
-#parallel --will-cite \
-#    ${CUR_DIR}/gradle_deps.sh \
-#    ::: "" ${PROJECTS[@]} \
-#    | sort -uV -o ${DEPS_LIST}
+PROJECTS=$(cat ${PROJ_LIST})
+parallel --will-cite \
+    ${CUR_DIR}/gradle_deps.sh \
+    ::: "" ${PROJECTS[@]} \
+    | sort -uV -o ${DEPS_LIST}
 
 echo -e "\033[2KFound ${GRN}$(wc -l < ${DEPS_LIST})${RST} dependencies..."
 
@@ -44,11 +44,11 @@ if [[ ! -s "${DEPS_URLS}.old" ]] && [[ -s "${DEPS_URLS}" ]]; then
 fi
 
 # find download URLs for each dependency
-#DEPENDENCIES=$(cat ${DEPS_LIST})
-#parallel --will-cite \
-#    ${CUR_DIR}/determine_url.sh \
-#    ::: ${DEPENDENCIES[@]} \
-#    | sort -uV -o ${DEPS_URLS}
+DEPENDENCIES=$(cat ${DEPS_LIST})
+parallel --will-cite \
+    ${CUR_DIR}/determine_url.sh \
+    ::: ${DEPENDENCIES[@]} \
+    | sort -uV -o ${DEPS_URLS}
 
 echo -e "\033[2KFound ${GRN}$(wc -l < ${DEPS_URLS})${RST} dependency URLs..."
 

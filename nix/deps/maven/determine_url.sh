@@ -73,7 +73,7 @@ function determineArtifactUrl() {
   fi
 
   # otherwise try to find it via fetching
-  for mavenSourceUrl in ${REPOS[@]}; do
+  for mavenSourceUrl in ${REPOS_SORTED[@]}; do
     if tryGetPOMFromURL "$mavenSourceUrl/$path"; then
       echo "$mavenSourceUrl/$path"
       return
