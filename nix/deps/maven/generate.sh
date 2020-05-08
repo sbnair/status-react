@@ -29,11 +29,11 @@ ${CUR_DIR}/gradle_projects.sh | sort -u -o ${PROJ_LIST}
 
 echo -e "Found ${GRN}$(wc -l < ${PROJ_LIST})${RST} sub-projects..."
 
-# check each sub-project in parallel
+# check each sub-project in parallel, the "" is for local deps
 PROJECTS=$(cat ${PROJ_LIST})
 parallel --will-cite \
     ${CUR_DIR}/gradle_deps.sh \
-    ::: ${PROJECTS[@]} \
+    ::: "" ${PROJECTS[@]} \
     | sort -uV -o ${DEPS_LIST}
 
 echo -e "\033[2KFound ${GRN}$(wc -l < ${DEPS_LIST})${RST} dependencies..."
