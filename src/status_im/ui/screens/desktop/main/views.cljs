@@ -16,10 +16,8 @@
 
 (views/defview tab-views []
   (views/letsubs [{:keys [tab-view-id]} [:desktop/desktop]]
-    (let [component (case tab-view-id
-                      react/view)]
-      [react/view {:style {:flex 1}}
-       [component]])))
+    [react/view {:style {:flex 1}}
+     [react/view]]))
 
 (views/defview popup-view []
   (views/letsubs [{:keys [popup]} [:desktop]]
