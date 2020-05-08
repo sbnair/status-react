@@ -44,9 +44,10 @@ if [[ -z "${1}" ]]; then
     exit 1
 fi
 
+OBJ_REL_URL=${1}
+
 echo -en "\033[2K - Nix entry for: ${1}\r" >&2
 
-OBJ_REL_URL=${1}
 REPO_NAME=$(match_repo "${OBJ_REL_URL}")
 # Get the relative path without full URL
 OBJ_REL_NAME="${OBJ_REL_URL#${REPOS[${REPO_NAME}]}/}"

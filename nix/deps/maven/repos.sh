@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# This file defines URLs of Maven repos we know about
-
+# This defines URLs of Maven repos we know about and use.
 declare -A REPOS=(
   [apache]="https://repo.maven.apache.org/maven2"
   [gradle]="https://plugins.gradle.org/m2"
@@ -13,7 +12,9 @@ declare -A REPOS=(
   [maven]="https://repo1.maven.org/maven2"
 )
 
-# This is useful to lower number of URL checks
+# I know this is dumb, but associative arrays don't have an order
+# and this should be ordered to reduce number of URL checks.
+# These were sorted on the frequency of different repos in deps.urls.
 declare -a REPOS_SORTED=(
   "https://repo.maven.apache.org/maven2"
   "https://plugins.gradle.org/m2"

@@ -65,7 +65,7 @@ function determineArtifactUrl() {
 
   # check old file for URL to avoid making requests if possible
   if [[ -s "${CUR_DIR}/deps.urls.old" ]]; then
-      local url=$(grep ${path} ${CUR_DIR}/deps.urls.old)
+      local url=$(grep ${path} ${CUR_DIR}/deps.urls.old | sort -V | head -n1)
       if [[ -n "${url}" ]]; then
           echo "${url}"
           return

@@ -8,7 +8,12 @@ GIT_ROOT=$(cd "${BASH_SOURCE%/*}" && git rev-parse --show-toplevel)
 # Gradle needs to be run in 'android' subfolder
 cd $GIT_ROOT/android
 
-# Run the gradle command for a project and:
+# Run the gradle command for a project:
+# - ':buildEnvironment' to get build tools
+# - ':dependencies' to get direct deps limited those by
+#   implementation config to avoid test dependencies
+#
+# And clean up the output by:
 # - remove lines that end with (*) or (n) but don't start with (+)
 # - keep only lines that start with \--- or +---
 # - remove lines that refer to a project
@@ -20,6 +25,7 @@ cd $GIT_ROOT/android
 gradle --console plain \
     "${1}:buildEnvironment" \
     "${1}:dependencies" \
+    --configuration implementation \
     | grep --invert-match -E "^[^+].+ \([\*n]\)$" \
     | grep -e "[\\\+]---" \
     | grep --invert-match -e "--- project :" \
