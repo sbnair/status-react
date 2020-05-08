@@ -74,7 +74,7 @@ POM_SHA1=$(get_sha1 "${POM_PATH}")
 echo -n "
   \"${OBJ_REL_NAME}\" =
   {
-    host = repos.${REPO_NAME};
+    host = \"${REPOS[${REPO_NAME}]}\";
     path = \"${OBJ_REL_NAME}\";
     type = \"${OBJ_TYPE}\";
     pom = {

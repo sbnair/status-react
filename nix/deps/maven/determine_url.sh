@@ -127,7 +127,7 @@ function retrieveAdditionalDependencies() {
         continue
       elif [ "$artifactUrl" = "<NOTFOUND>" ]; then
         # Some dependencies don't contain a normal format, so we ignore them (e.g. `com.squareup.okhttp:okhttp:{strictly`)
-        echo " ! Failed to find URL for: $DEP" >&2
+        echo -e "\033[2K ! Failed to find URL for: $DEP" >&2
         continue
       fi
 
@@ -156,7 +156,7 @@ FOUND_URL=$(determineArtifactUrl $DEP)
 
 if [ -z "${FOUND_URL}" ] || [ "${FOUND_URL}" = "<NOTFOUND>" ]; then
     # Some dependencies don't contain a normal format
-    echo " ! Failed to find URL for: $DEP" >&2
+    echo -e "\033[2K ! Failed to find URL for: $DEP" >&2
     exit 1
 fi
 
