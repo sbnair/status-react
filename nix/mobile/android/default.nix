@@ -12,11 +12,11 @@ let
   watchmanFactory = callPackage ./watchman.nix { };
 
   # Import a local patched version of node_modules, together with a local version of the Maven repo
-  #mavenAndNpmDeps = callPackage ./maven-and-npm-deps { };
+  mavenAndNpmDeps = callPackage ./maven-and-npm-deps { };
 
   # TARGETS
   release = callPackage ./targets/release-android.nix {
-    inherit gradle jsbundle status-go watchmanFactory;
+    inherit gradle mavenAndNpmDeps jsbundle status-go watchmanFactory;
   };
 
   generate-maven-and-npm-deps-shell = callPackage ./maven-and-npm-deps/maven/shell.nix {
@@ -48,6 +48,7 @@ in {
 
       # required by some makefile targets
       export STATUS_GO_ANDROID_LIBDIR=${status-go}
+
     '';
       # check if node modules changed and if so install them
       #$STATUS_REACT_HOME/nix/mobile/reset-node_modules.sh "${mavenAndNpmDeps.drv}/project"

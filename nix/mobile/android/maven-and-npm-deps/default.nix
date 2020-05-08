@@ -7,8 +7,6 @@
 , localMavenRepoBuilder }:
 
 let
-  mavenLocalRepo = callPackage ./maven { inherit localMavenRepoBuilder stdenv; };
-
   # fake build to pre-download deps into fixed-output derivation
   drv = 
     let
@@ -39,7 +37,7 @@ let
           };
         phases = [ "unpackPhase" "patchPhase" "installPhase" "fixupPhase" ];
         nativeBuildInputs = [ deps.nodejs ];
-        buildInputs = with pkgs; [ gradle nodejs file zlib mavenLocalRepo ];
+        buildInputs = with pkgs; [ gradle nodejs file zlib deps.maven ];
         propagatedBuildInputs = [ deps.react-native ];
         unpackPhase = ''
           runHook preUnpack
@@ -52,7 +50,7 @@ let
 
           # Copy RN maven dependencies and make them writable, otherwise Gradle copy fails (since the top-level directory is read-only, Java isn't smart enough to copy the child files/folders into that target directory)
           mkdir -p ${mavenRepoDir}
-          cp -a ${mavenLocalRepo}/. ${mavenRepoDir}
+          cp -a ${deps.maven}/. ${mavenRepoDir}
           cp -a ${deps.react-native}/deps ${reactNativeDepsDir}
           find ${reactNativeDepsDir} -maxdepth 1 -type d -exec chmod -R u+w {} \;
 
@@ -107,9 +105,9 @@ let
           }
 
           # Patch maven and google central repositories with our own local directories. This prevents the builder from downloading Maven artifacts
-          patchMavenSources 'android/build.gradle' '${mavenLocalRepo}'
+          patchMavenSources 'android/build.gradle' '${deps.maven}'
           for f in `find ${projectBuildDir}/node_modules/ -name build.gradle`; do
-            patchMavenSources $f '${mavenLocalRepo}'
+            patchMavenSources $f '${deps.maven}'
           done
 
           # Do not add a BuildId to the generated libraries, for reproducibility

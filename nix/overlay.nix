@@ -22,6 +22,7 @@ in {
 
   # Project dependencies
   deps = {
+    maven = callPackage ./deps/maven { };
     clojure = callPackage ./deps/clojure { };
     nodejs = callPackage ./deps/nodejs { };
     react-native = callPackage ./deps/react-native { };

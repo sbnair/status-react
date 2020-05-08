@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+CUR_DIR=$(cd "${BASH_SOURCE%/*}" && pwd)
+
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
 mavenSources=( \
@@ -43,12 +45,15 @@ function getPath() {
   echo "$groupId/$artifactId/$version/$artifactId-$version"
 }
 
-# Tries to download a POM to $tmp_pom_filename given a base URL (also checks for empty files)
+# Tries to download a POM, fails on 404
 function tryGetPOMFromURL() {
-  local url="$1"
-
-  rm -f ${tmp_pom_filename}
-  curl --output ${tmp_pom_filename} --silent --fail --location "$url.pom" && test -s ${tmp_pom_filename}
+    # Using nix-prefetch-url so it's already downloaded for next step
+    FETCH_OUT=$(nix-prefetch-url --print-path "${1}.pom" 2>/dev/null)
+    RVAL=${?}
+    POM_PATH=$(echo "${FETCH_OUT}" | tail -n1)
+    # We symlink the POM it can be used with retrieveAdditionalDependencies
+    [[ ${RVAL} -eq 0 ]] && ln -s "${POM_PATH}" "${TMP_POM_SYMLINK}"
+    return ${RVAL}
 }
 
 # Given the components of a package ID, will loop through known repositories to figure out a source for the package
@@ -59,8 +64,16 @@ function determineArtifactUrl() {
   [ -z "$groupId" ] && return
   local artifactId=${tokens[1]}
   local version=$(echo "${tokens[2]}" | cut -d'@' -f1)
-
   local path=$(getPath "${tokens[@]}")
+
+  # check old file for URL to avoid making requests if possible
+  local url=$(grep ${path} ${CUR_DIR}/deps.urls.old)
+  if [[ ${?} -eq 0 ]]; then
+      echo "${url}"
+      return
+  fi
+
+  # otherwise try to find it via fetching
   for mavenSourceUrl in ${mavenSources[@]}; do
     if tryGetPOMFromURL "$mavenSourceUrl/$path"; then
       echo "$mavenSourceUrl/$path"
@@ -114,7 +127,7 @@ function retrieveAdditionalDependencies() {
         continue
       elif [ "$artifactUrl" = "<NOTFOUND>" ]; then
         # Some dependencies don't contain a normal format, so we ignore them (e.g. `com.squareup.okhttp:okhttp:{strictly`)
-        echo " ! Failed to find URL: $DEP" >&2
+        echo " ! Failed to find URL for: $DEP" >&2
         continue
       fi
 
@@ -130,25 +143,23 @@ if [[ -z "${DEP}" ]]; then
     exit 1
 fi
 
+# This will be a symlink to downloaded POM file
+TMP_POM_SYMLINK=$(mktemp --tmpdir -u fetch-maven-deps-XXXXX.pom)
+tmp_mvn_dep_tree_filename=$(mktemp --tmpdir mvn-dep-tree-XXXXX.txt)
 mvn_tmp_repo=$(mktemp -d)
-tmp_pom_filename=$(mktemp --tmpdir fetch-maven-deps-XXXX.pom)
-tmp_mvn_dep_tree_filename=$(mktemp --tmpdir mvn-dep-tree-XXXX.txt)
 
-trap "rm -rf ${mvn_tmp_repo} ${tmp_pom_filename} $deps_file_path ${tmp_mvn_dep_tree_filename}" ERR EXIT HUP INT
+trap "rm -rf ${TMP_POM_SYMLINK} ${tmp_mvn_dep_tree_filename}" ERR EXIT HUP INT
 
-echo -en "\033[2K  - Finding URL: ${DEP}\r" >&2
+echo -en "\033[2K - Finding URL: ${DEP}\r" >&2
 
 FOUND_URL=$(determineArtifactUrl $DEP)
 
-if [ -z "${FOUND_URL}" ]; then
-    echo " ! No URL found: ${DEP}" >&2
-    exit
-elif [ "${FOUND_URL}" = "<NOTFOUND>" ]; then
-    # Some dependencies don't contain a normal format, so we ignore them (e.g. `com.squareup.okhttp:okhttp:{strictly`)
-    echo " ! Failed to find URL: $DEP" >&2
-    exit
+if [ -z "${FOUND_URL}" ] || [ "${FOUND_URL}" = "<NOTFOUND>" ]; then
+    # Some dependencies don't contain a normal format
+    echo " ! Failed to find URL for: $DEP" >&2
+    exit 1
 fi
 
 echo "${FOUND_URL}"
 
-retrieveAdditionalDependencies ${tmp_pom_filename}
+retrieveAdditionalDependencies "${TMP_POM_SYMLINK}"

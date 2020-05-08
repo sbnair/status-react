@@ -36,7 +36,11 @@ parallel --will-cite \
     ${CUR_DIR}/gradle_deps.sh \
     ::: ${PROJECTS[@]} \
     | sort -uV -o ${DEPS_LIST}
+
 echo -e "\033[2KFound ${GRN}$(wc -l < ${DEPS_LIST})${RST} dependencies..."
+
+# Save old URLs file to improve search
+mv "${DEPS_URLS}" "${DEPS_URLS}.old"
 
 # find download URLs for each dependency
 DEPENDENCIES=$(cat ${DEPS_LIST})
@@ -48,9 +52,13 @@ parallel --will-cite \
 echo -e "\033[2KFound ${GRN}$(wc -l < ${DEPS_URLS})${RST} URLs..."
 
 # Format URLs into a Nix consumable file
-"${CUR_DIR}/urls2nix.sh" ${DEPS_URLS} > ${DEPS_NIX}
+URLS=$(cat ${DEPS_URLS})
+parallel --will-cite --keep-order \
+    "${CUR_DIR}/url2nix.sh" \
+    ::: ${URLS} \
+    > ${DEPS_NIX}
 
-echo "Generated Nix deps file: ${DEPS_NIX}"
+echo "\033[2KGenerated Nix deps file: ${DEPS_NIX}"
 echo -e "${GRN}Done${RST}"
 
 popd > /dev/null
