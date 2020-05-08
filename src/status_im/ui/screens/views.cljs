@@ -23,6 +23,7 @@
             status-im.ui.screens.wallet.collectibles.superrare.views
             status-im.ui.screens.wallet.collectibles.kudos.views
             [status-im.ui.components.colors :as colors]
+            [status-im.ui.components.invite.views :as invite]
             [status-im.hardwallet.test-menu :as hardwallet.test-menu]
             [status-im.utils.config :as config]
             [status-im.reloader :as reloader]))
@@ -101,20 +102,21 @@
        ^{:key (str @colors/theme @reloader/cnt)}
        [react/view {:flex             1
                     :background-color colors/black-persist}
-        [navigation/navigation-container
-         (merge {:ref               (fn [r]
-                                      (navigation/set-navigator-ref r))
-                 :onStateChange     on-state-change
-                 :enableURLHandling false}
-                (when debug?
-                  {:enableURLHandling true
-                   :initialState      @state}))
-         [main-app-navigator]]
+        ;; [navigation/navigation-container
+        ;;  (merge {:ref               (fn [r]
+        ;;                               (navigation/set-navigator-ref r))
+        ;;          :onStateChange     on-state-change
+        ;;          :enableURLHandling false}
+        ;;         (when debug?
+        ;;           {:enableURLHandling true
+        ;;            :initialState      @state}))
+        ;;  [main-app-navigator]]
+        [invite/referral-sheet]
         [wallet/prepare-transaction]
         [wallet/request-transaction]
         [wallet/select-account]
         [signing/signing]
-        [bottom-sheet]
+        ;; [bottom-sheet]
         [popover/popover]
         (when debug?
           [reloader/reload-view @reloader/cnt])
