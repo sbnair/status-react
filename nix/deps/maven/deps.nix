@@ -3357,21 +3357,6 @@
     };
   };
 
-  "com/sun/istack/istack-commons-runtime/2.21/istack-commons-runtime-2.21" =
-  {
-    host = "https://maven.java.net/content/repositories/releases";
-    path = "com/sun/istack/istack-commons-runtime/2.21/istack-commons-runtime-2.21";
-    type = "jar";
-    pom = {
-      sha1 = "04c234cf684a202c5c9bb7f0a198ba97e958f8f4";
-      sha256 = "073dc9605ak2zns72l3mac5ynnz5k8rkyzwsbxa51l5zbxxi7rzb";
-    };
-    jar = {
-      sha1 = "c969d8f15c467f0ef7d7b04889afbe7b5d48e22f";
-      sha256 = "1x2hm4dq75jg8cz4n1ac3b6gki6p5m0kk89d1qmg15bhh2h6fgn3";
-    };
-  };
-
   "com/sun/xml/fastinfoset/FastInfoset/1.2.13/FastInfoset-1.2.13" =
   {
     host = "https://maven.java.net/content/repositories/releases";
@@ -3387,21 +3372,6 @@
     };
   };
 
-  "javax/xml/bind/jaxb-api/2.2.12-b140109.1041/jaxb-api-2.2.12-b140109.1041" =
-  {
-    host = "https://maven.java.net/content/repositories/releases";
-    path = "javax/xml/bind/jaxb-api/2.2.12-b140109.1041/jaxb-api-2.2.12-b140109.1041";
-    type = "jar";
-    pom = {
-      sha1 = "a400fbd62fa68fae267b5641c3e4bb740a0f7335";
-      sha256 = "0nqm2szwfjfmb9dnvrisr145r492csjdwjq9kg2rhmmwv7cag4i0";
-    };
-    jar = {
-      sha1 = "7ed0e0d01198614194d56dfb03d9d95aa311824c";
-      sha256 = "1whi48cdrzjwp13hnpa9sg719gagiw0dvibl9b703zxmnzc0rrmm";
-    };
-  };
-
   "org/glassfish/jaxb/jaxb-core/2.2.11/jaxb-core-2.2.11" =
   {
     host = "https://maven.java.net/content/repositories/releases";
@@ -3414,36 +3384,6 @@
     jar = {
       sha1 = "f5745049f5fb9cb9d9b5f513c207727f475983e9";
       sha256 = "1amjhysjp6hbn6bccr2img6px5l63cigcnra6p464hxhxglaxg1p";
-    };
-  };
-
-  "org/glassfish/jaxb/txw2/2.2.11/txw2-2.2.11" =
-  {
-    host = "https://maven.java.net/content/repositories/releases";
-    path = "org/glassfish/jaxb/txw2/2.2.11/txw2-2.2.11";
-    type = "jar";
-    pom = {
-      sha1 = "4be03527dbf2428f7ea99fb9c2f50f089dffad5e";
-      sha256 = "1n3b8233l5qa5l44866grbrs1l4vacp66ar7ryjmkjjg9drcn545";
-    };
-    jar = {
-      sha1 = "2df047d8c187a62f2177bf6013f1f9786cdfc8a2";
-      sha256 = "1smgbsxjcmfsahlskir0aa6sng656f32mk9034si2iassk53qai7";
-    };
-  };
-
-  "org/jvnet/staxex/stax-ex/1.7.7/stax-ex-1.7.7" =
-  {
-    host = "https://maven.java.net/content/repositories/releases";
-    path = "org/jvnet/staxex/stax-ex/1.7.7/stax-ex-1.7.7";
-    type = "jar";
-    pom = {
-      sha1 = "797e24598297af973b622e9a41662d0bbc497658";
-      sha256 = "1b9yhymk6zp9sva68v0829xsrvsdz03rjlb2hfyh0yindh5lbjr7";
-    };
-    jar = {
-      sha1 = "18bed5a0da27a6b43efe01282f2dc911b1cb3a72";
-      sha256 = "1d1zh4ymilfc2shm51fcwb7c4i5f6nnmkvkzksqdxh33f7bzf7x3";
     };
   };
 
@@ -6799,21 +6739,6 @@
     pom = {
       sha1 = "3fdc8adc054c5418bd76858dce64350bb8655ac5";
       sha256 = "0b1nn9m3wwvklk1ap3nr295dj9fy1s4nhv05y5b3ngsxk9lqqfcs";
-    };
-  };
-
-  "com/sun/xml/fastinfoset/FastInfoset/1.2.13/FastInfoset-1.2.13" =
-  {
-    host = "https://repo.maven.apache.org/maven2";
-    path = "com/sun/xml/fastinfoset/FastInfoset/1.2.13/FastInfoset-1.2.13";
-    type = "jar";
-    pom = {
-      sha1 = "bc1ac953addb710ec08dcca6465bb1f6fcfd7ee9";
-      sha256 = "1lsm4vzj4n82la9bs72kvj4sgl8i2vvnjr9ym96mnjbxrw75wl5p";
-    };
-    jar = {
-      sha1 = "098f56b9354e27bd2941cc5d461344e240ae51ae";
-      sha256 = "0f70phr6cysnrsbfsbmd318h81nvy5dcadqs1cy87hpk16wpv9r7";
     };
   };
 
@@ -13539,21 +13464,6 @@
     pom = {
       sha1 = "eed2bcd59f35f07507c553bbd7da20415cc7f63e";
       sha256 = "0f4d9p4vgidkq2v6s6gqkc5rpm5gz9fv5l2i59x9zp3hy186hbm5";
-    };
-  };
-
-  "org/glassfish/jaxb/jaxb-core/2.2.11/jaxb-core-2.2.11" =
-  {
-    host = "https://repo.maven.apache.org/maven2";
-    path = "org/glassfish/jaxb/jaxb-core/2.2.11/jaxb-core-2.2.11";
-    type = "jar";
-    pom = {
-      sha1 = "f3208abdc61be827cf28838c3881213648807821";
-      sha256 = "094v2z4ai9v6jnq4jwsb9mfqfvapq0g26nagafcvzjiv42gl0cgc";
-    };
-    jar = {
-      sha1 = "f5745049f5fb9cb9d9b5f513c207727f475983e9";
-      sha256 = "1amjhysjp6hbn6bccr2img6px5l63cigcnra6p464hxhxglaxg1p";
     };
   };
 
