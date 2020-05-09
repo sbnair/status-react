@@ -22,10 +22,14 @@ cd $GIT_ROOT/android
 # - drop entries that aren't just the name of the dependency
 # - drop entries starting with `status-im:` like `status-go`
 
-gradle --console plain \
+TMPOUT="/tmp/gradle-${1}.out"
+
+gradle --no-daemon --console plain \
     "${1}:buildEnvironment" \
     "${1}:dependencies" \
-    --configuration implementation \
+    > ${TMPOUT}
+
+cat ${TMPOUT} \
     | grep --invert-match -E "^[^+].+ \([\*n]\)$" \
     | grep -e "[\\\+]---" \
     | grep --invert-match -e "--- project :" \
